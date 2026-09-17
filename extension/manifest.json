@@ -1,0 +1,27 @@
+{
+  "manifest_version": 2,
+  "name": "Amazon Quote Automation Bridge",
+  "version": "1.0.0",
+  "description": "Adds ASIN/Quantity items to an Amazon Business quote page, driven by the desktop app running on this same machine. Runs only in your own tab — no separate browser window. Works in both Chrome and Firefox.",
+  "permissions": [
+    "tabs",
+    "http://127.0.0.1/*",
+    "https://www.amazon.com/*"
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": true
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.amazon.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "amazon-quote-automation@localhost"
+    }
+  }
+}

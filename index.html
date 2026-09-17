@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Amazon Quote Automation</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Amazon Quote Automation 1</h1>
+    <p class="subtitle">Upload an Excel file containing ASIN and Quantity.</p>
+
+    <div class="panel">
+      <button id="selectExcelBtn">Select Excel File</button>
+      <div class="file-info">
+        <div><strong>Selected file:</strong> <span id="selectedFile">None</span></div>
+        <div><strong>Total records:</strong> <span id="totalRecords">0</span></div>
+      </div>
+      <div id="validationErrors" class="errors hidden"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Preview</h2>
+      <table id="previewTable">
+        <thead>
+          <tr><th>#</th><th>ASIN</th><th>Quantity</th><th>Status</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="panel controls">
+      <div class="browser-choice">
+        <span>Run in:</span>
+        <label><input type="radio" name="browserTarget" value="chrome" checked /> Chrome</label>
+        <label><input type="radio" name="browserTarget" value="firefox" /> Firefox</label>
+      </div>
+      <button id="startBtn" disabled>Start Automation</button>
+      <button id="stopBtn" disabled>Stop Automation</button>
+      <p class="hint">
+        Runs inside your own browser tab via the companion extension —
+        make sure it's installed in the browser selected above and
+        you're logged into Amazon Business before starting (see README
+        for one-time setup).
+      </p>
+    </div>
+
+    <div class="panel">
+      <h2>Progress</h2>
+      <div id="progressText">Processing 0 / 0</div>
+      <div id="currentAsin">Current ASIN: —</div>
+      <div id="currentQty">Quantity: —</div>
+      <div id="currentStatus">Status: Idle</div>
+      <div class="progress-bar-track">
+        <div id="progressBarFill" class="progress-bar-fill"></div>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="completionPanel">
+      <h2>Automation Completed</h2>
+      <div>Total: <span id="finalTotal">0</span></div>
+      <div>Successfully Added: <span id="finalSuccess">0</span></div>
+      <div>Failed: <span id="finalFailed">0</span></div>
+      <button id="downloadBtn">Download Successful Items</button>
+    </div>
+
+    <div class="panel">
+      <h2>Log</h2>
+      <div id="logPanel" class="log-panel"></div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+{
+  "name": "amazon-quote-automation",
+  "version": "1.0.0",
+  "description": "Automates adding ASIN/Quantity items to an Amazon Request a Quote page from an Excel file.",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "dist": "electron-builder --win"
+  },
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.example.amazonquoteautomation",
+    "productName": "AmazonQuoteAutomation",
+    "files": [
+      "src/**/*",
+      "config.json",
+      "package.json"
+    ],
+    "extraResources": [
+      { "from": "extension", "to": "extension" }
+    ],
+    "win": {
+      "target": [
+        { "target": "portable", "arch": ["x64"] }
+      ],
+      "icon": "build/icon.ico"
+    }
+  }
+}

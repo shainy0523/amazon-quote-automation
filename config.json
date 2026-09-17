@@ -1,0 +1,7 @@
+{
+  "quoteUrl": "https://www.amazon.com/ab/bulk-order/input",
+  "maxAsins": 49,
+  "maxRetries": 2,
+  "navigationTimeoutMs": 60000,
+  "actionTimeoutMs": 15000
+}
