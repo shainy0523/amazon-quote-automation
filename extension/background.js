@@ -19,6 +19,7 @@ const BASE_URL = 'http://127.0.0.1:47654';
 const BROWSER_NAME = typeof browser !== 'undefined' ? 'firefox' : 'chrome';
 
 let activeTabId = null;
+let activeWindowId = null;
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -53,6 +54,19 @@ async function pollLoop() {
 async function runJob(job) {
   const tab = await findOrCreateAmazonTab(job.quoteUrl);
   activeTabId = tab.id;
+  activeWindowId = tab.windowId;
+  // Jobs are normally started from the separate desktop app window, which
+  // then has OS focus while this browser window sits behind it. Firefox
+  // throttles timers (setTimeout, etc.) in windows it considers occluded/
+  // unfocused, which has been observed to silently stall content.js
+  // mid-job (a keystroke-simulation loop that never wakes from its own
+  // setTimeout) with no error and no page navigation. Raising this window
+  // to the front here covers the start of the job, but a user checking
+  // progress in the desktop app mid-batch re-steals focus and can trigger
+  // the same stall on a later item — content.js also pings ENSURE_FOCUSED
+  // before every item (see its message handler below) to keep this window
+  // in front for the whole batch, not just the first item.
+  await new Promise((resolve) => chrome.windows.update(tab.windowId, { focused: true }, resolve));
   await waitForTabComplete(tab.id);
   const delivered = await sendJobWithRetry(tab.id, job);
   console.log(`[AmazonQuoteAutomation] RUN_JOB delivered=${delivered}`);
@@ -138,11 +152,22 @@ function postJSON(path, body) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
-  }).catch(() => {});
+  }).catch((err) => {
+    // Previously swallowed silently — made every LOG/PROGRESS/STATUS/COMPLETE
+    // relay to the desktop app fail invisibly whenever the local bridge
+    // server was briefly unreachable, making a still-running job look like
+    // a dead hang in the app's log panel.
+    console.error(`[AmazonQuoteAutomation] postJSON ${path} failed:`, err);
+  });
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (!message || !message.type) return;
+
+  if (message.type === 'ENSURE_FOCUSED') {
+    if (activeWindowId != null) chrome.windows.update(activeWindowId, { focused: true }, () => {});
+    return;
+  }
 
   if (message.type === 'SHOULD_STOP') {
     fetch(`${BASE_URL}/api/shouldStop?jobId=${encodeURIComponent(message.jobId)}`)
